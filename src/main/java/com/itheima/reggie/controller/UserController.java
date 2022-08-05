@@ -35,7 +35,7 @@ public class UserController {
     private UserService userService;
 
     @Resource
-    private RedisTemplate RedisTemplate;
+    private RedisTemplate redisTemplate;
 
 
 
@@ -64,7 +64,7 @@ public class UserController {
            // session.setAttribute(phone,code);
 
             //将生成的验证码存储到redis中，并设置有效时间5分钟
-            RedisTemplate.opsForValue().set(phone,code,5, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(phone,code,5, TimeUnit.MINUTES);
             return R.success("手机验证码短信发送成功");
         }
 
@@ -91,7 +91,7 @@ public class UserController {
        // String codeInSession = (String) session.getAttribute(phone);
 
         //从redis中获取验证码
-        String codeInSession = (String) RedisTemplate.opsForValue().get(phone);
+        String codeInSession = (String) redisTemplate.opsForValue().get(phone);
 
         //进行验证码的比对 (页面提交的验证码和Session中保存的验证码比对)
         if(codeInSession !=null && codeInSession.equals(code)){
@@ -113,7 +113,7 @@ public class UserController {
              }
          session.setAttribute("user",user.getId());
              //如果用户登录成功，删除Redis中缓存的验证码
-            RedisTemplate.delete(phone);
+            redisTemplate.delete(phone);
 
          return R.success(user);
         }
