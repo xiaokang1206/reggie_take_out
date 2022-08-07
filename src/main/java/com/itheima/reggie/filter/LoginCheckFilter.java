@@ -8,6 +8,7 @@ import com.itheima.reggie.entity.Employee;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -21,6 +22,7 @@ import java.io.IOException;
 public class LoginCheckFilter implements Filter {
     //路径匹配器，支持通配符
     private static final AntPathMatcher PATH_MATCHER =new AntPathMatcher();
+
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -39,7 +41,11 @@ public class LoginCheckFilter implements Filter {
                        "/front/**",
                       "/common/**",
                       "/user/sendMsg",//移动端发送短信
-                      "/user/login"//移动端登录
+                      "/user/login",//移动端登录
+                      "/doc.html",
+                      "/webjars/**",
+                      "/swagger-resources",
+                       "/v2/api-docs"
         };
 
         //2.判断本次请求是否需要处理
