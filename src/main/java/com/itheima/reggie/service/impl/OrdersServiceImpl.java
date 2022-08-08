@@ -1,5 +1,6 @@
 package com.itheima.reggie.service.impl;
 
+import com.alibaba.druid.util.Utils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,6 +10,7 @@ import com.itheima.reggie.entity.*;
 import com.itheima.reggie.mapper.OrderMapper;
 import com.itheima.reggie.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +19,13 @@ import javax.xml.ws.Action;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@Transactional()
+@Transactional
 public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implements OrderService {
 
     @Autowired
@@ -70,9 +73,10 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
 
         long orderId = IdWorker.getId();//订单号
 
+
         AtomicInteger amount=new AtomicInteger(0);//初始值为0
 
-
+     //把购物车中的信息放入订单明细表
      List<OrderDetail> orderDetails =  shoppingCarts.stream().map((item)->{
 
          OrderDetail orderDetail=new OrderDetail();
@@ -116,6 +120,21 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
 
         //清空购物车
          shoppingCartService.remove(queryWrapper);
+
+    }
+
+    /**
+     * 订单派送
+     * @param orders
+     */
+    @Override
+    public void dispatch(Orders orders) {
+       //查询需要派送的订单
+        Orders ordersInfo = this.getById(orders.getId());
+
+        //修改订单的状态为3
+        ordersInfo.setStatus(orders.getStatus());
+        this.updateById(ordersInfo);
 
     }
 }

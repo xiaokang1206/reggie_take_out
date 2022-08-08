@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -133,7 +134,7 @@ public class DishController {
     }
 
     /**
-     * 新增菜品
+     * 修改菜品
      * @param dishDto
      * @return
      */
@@ -158,7 +159,7 @@ public class DishController {
     }
 
     /**
-     * 根据条件查询对应的菜品数据
+     * 根据条件查询对应的菜品分类
      * @param dish
      * @return
      */
@@ -236,6 +237,36 @@ public class DishController {
 
 
         return R.success(dishDtoList);
+    }
+
+
+  //修改菜品状态
+
+    @PostMapping("/status/{statu}")
+    public R<String> updateStatus(@PathVariable int statu , long[] ids ){
+
+          log.info("status:",statu,"ids:", Arrays.asList(ids));
+
+
+        dishService.updateStatus(statu,ids);
+
+      return R.success("菜品状态修改成功");
+    }
+
+    /**
+     * 删除菜品并删除菜品的口味信息
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+
+        log.info("ids:",ids);
+
+        dishService.delete(ids);
+
+        return R.success("删除成功");
+
     }
 
 }

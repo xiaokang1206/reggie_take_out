@@ -10,4 +10,10 @@ public interface OrderService extends IService<Orders> {
      * @param orders
      */
     public void submit(Orders orders);
+
+    /**
+     * 派送订单
+     * @param orders
+     */
+     public void dispatch(Orders orders);
 }

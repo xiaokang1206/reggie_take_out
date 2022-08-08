@@ -158,4 +158,35 @@ public class SetmealController {
         return R.success(list);
     }
 
+    /**
+     * 根据id查询套餐信息
+     * @param id
+     */
+    @GetMapping ("/{id}")
+    public R<SetmealDto> getById(@PathVariable long id){
+
+
+     SetmealDto setmeal= setmealService.getSetmealAndDish(id);
+             return R.success(setmeal);
+    }
+
+    @PutMapping
+    public R<String> update(@RequestBody SetmealDto setmealDto){
+
+setmealService.updateSetmealAndSetmeal_Dish(setmealDto);
+
+        return R.success("套餐修改成功");
+
+    }
+    @PostMapping("/status/{statusCode}")
+    public R<String> status(@PathVariable int statusCode ,@RequestParam  List<Long> ids ){
+
+     log.info("statusCode: {} ,ids: {}",statusCode,ids);
+
+     setmealService.updateStatus(statusCode,ids);
+
+
+           return R.success("菜品状态修改成功");
+    }
+
 }

@@ -5,6 +5,8 @@ import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Dish;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 
 public interface DishService extends IService<Dish> {
 
@@ -17,4 +19,13 @@ public interface DishService extends IService<Dish> {
    //更新菜品信息和口味信息
    public void updateWithFlavor(DishDto dishDto);
 
+    /**
+     * 修改菜品状态信息
+     * @param statu ids
+     */
+   public void updateStatus(int statu,long[] ids);
+
+
+   //删除菜品信息
+   public void delete(List<Long> ids);
 }
