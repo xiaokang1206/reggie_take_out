@@ -97,7 +97,7 @@ public class DishController {
 
                 List<Dish> records=pageInfo.getRecords();
 
-        List<DishDto> list= records.stream().map((item)->{
+            List<DishDto> list= records.stream().map((item)->{
 
                     DishDto dishDto=new DishDto();
                     //拷贝的是数据信息

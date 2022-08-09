@@ -4,6 +4,11 @@ spring:
   application:
     #应用的名称，可选
     name: reggie_take_out
+  mail:
+    host: smtp.qq.com
+    username: 1833976463@qq.com
+    password: taloizrpsfwubcbb
+
   shardingsphere:
     datasource:
       names:
@@ -12,7 +17,7 @@ spring:
       master:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://192.168.242.129:3306/reggie?characterEncoding=utf-8
+        url: jdbc:mysql://192.168.242.129:3306/reggie?characterEncoding=utf-8&serverTimezone=UTC&useSSL=false
         username: root
         password: root
       # 从数据源
