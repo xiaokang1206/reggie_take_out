@@ -71,10 +71,11 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
         }
 
 
-        long orderId = IdWorker.getId();//订单号
+        long orderId = IdWorker.getId();//19位数的订单号
 
 
         AtomicInteger amount=new AtomicInteger(0);//初始值为0
+
 
      //把购物车中的信息放入订单明细表
      List<OrderDetail> orderDetails =  shoppingCarts.stream().map((item)->{
@@ -91,6 +92,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrderMapper, Orders> implemen
          //初始值0 +商品1单价 X 商品1数量 + 商品2单价 X 商品2数量 + 商品3单价 X 商品3数量 ...
          //以原子方式将给定值添加到当前值，并在添加后返回新值。
          amount.addAndGet(item.getAmount().multiply(new BigDecimal(item.getNumber())).intValue());
+
 
          return orderDetail;
 

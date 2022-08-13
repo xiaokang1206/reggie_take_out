@@ -89,7 +89,7 @@ public class EmployeeController {
        // employee.setCreateTime(LocalDateTime.now());
         //employee.setUpdateTime(LocalDateTime.now());
         //获得当前登录用户的id
-        Long empId = (Long) request.getSession().getAttribute("employee");
+       // Long empId = (Long) request.getSession().getAttribute("employee");
         //
       //  employee.setCreateUser(empId);
        // employee.setUpdateUser(empId);
@@ -131,7 +131,7 @@ public class EmployeeController {
      @PutMapping
     public  R<String> update(HttpServletRequest request,@RequestBody  Employee employee){
            log.info(employee.toString());
-         Long empId = (Long) request.getSession().getAttribute("employee");
+        // Long empId = (Long) request.getSession().getAttribute("employee");
 
          //设置本次修改时间
       //  employee.setUpdateTime(LocalDateTime.now());
@@ -154,6 +154,8 @@ public class EmployeeController {
         }
 
     }
+
+
 
 
 }

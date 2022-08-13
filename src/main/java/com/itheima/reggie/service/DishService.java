@@ -1,6 +1,8 @@
 package com.itheima.reggie.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Dish;
 import org.apache.ibatis.annotations.Mapper;
@@ -28,4 +30,22 @@ public interface DishService extends IService<Dish> {
 
    //删除菜品信息
    public void delete(List<Long> ids);
+
+    /**
+     * 菜品信息分页查询
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
+   public R<Page> page_category(int page, int pageSize, String name);
+
+
+    /**
+     * 根据条件查询对应的菜品分类
+     * @param dish
+     * @return
+     */
+
+    public List<DishDto> SelectDishAndDish_Flavor(Dish dish);
 }

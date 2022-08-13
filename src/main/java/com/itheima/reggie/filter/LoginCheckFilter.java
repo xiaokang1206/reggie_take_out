@@ -14,6 +14,7 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 //检查用户是否登录
@@ -39,7 +40,7 @@ public class LoginCheckFilter implements Filter {
                        "/employee/logout",
                        "/backend/**",
                        "/front/**",
-                      "/common/**",
+                      "/common/**",//上传下载
                       "/user/sendMsg",//移动端发送短信
                       "/user/login",//移动端登录
                       "/doc.html",

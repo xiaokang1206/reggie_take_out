@@ -1,21 +1,27 @@
 package com.itheima.reggie.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.common.CustomException;
+import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.DishDto;
+import com.itheima.reggie.entity.Category;
 import com.itheima.reggie.entity.Dish;
 import com.itheima.reggie.entity.DishFlavor;
 import com.itheima.reggie.mapper.DishMapper;
+import com.itheima.reggie.service.CategoryService;
 import com.itheima.reggie.service.DishFlavorService;
 import com.itheima.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +31,13 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Autowired
     private DishFlavorService dishFlavorService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 新增菜品，同时保存对应的口味数据
@@ -152,6 +165,127 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
 
     }
+
+    @Override
+    public R<Page> page_category(int page , int pageSize, String name) {
+        //构造分页构造器对象
+        Page<Dish> pageInfo=new Page<Dish>(page,pageSize);
+        Page<DishDto> dishDtoPage=new Page<DishDto>();
+        //条件构造器
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper=new LambdaQueryWrapper<Dish>();
+        //添加过滤条件
+        lambdaQueryWrapper.like(name!=null,Dish::getName,name);
+        //添加排序条件
+        lambdaQueryWrapper.orderByDesc(Dish::getUpdateTime);
+
+        //执行分页查询
+        this.page(pageInfo,lambdaQueryWrapper);
+
+        //对象拷贝,拷贝的是分页相关信息，忽略records（分页数据）
+        BeanUtils.copyProperties(pageInfo,dishDtoPage,"records");
+
+        List<Dish> records=pageInfo.getRecords();
+
+        List<DishDto> list= records.stream().map((item)->{
+
+            DishDto dishDto=new DishDto();
+            //拷贝的是数据信息
+            BeanUtils.copyProperties(item,dishDto);
+
+            Long categoryId = item.getCategoryId();
+            Category category = categoryService.getById(categoryId);
+            if(category!=null){
+                String categoryName = category.getName();
+                dishDto.setCategoryName(categoryName);
+            }
+
+            return dishDto;
+            //收集dishDto对象，转换成集合
+        }).collect(Collectors.toList());
+
+
+        dishDtoPage.setRecords(list);
+
+        return R.success(dishDtoPage);
+    }
+
+    /**
+     * 查询菜品信息，移动端显示
+     * @param dish
+     * @return
+     */
+    @Override
+    public List<DishDto> SelectDishAndDish_Flavor(Dish dish) {
+        List<DishDto> dishDtoList=null;
+
+        String key="dish_"+dish.getCategoryId()+"_"+dish.getStatus();
+
+
+        //查询redis，如果redis中有数据直接返回
+        dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
+        if(dishDtoList!=null){
+
+            return dishDtoList;
+
+        }
+
+
+        //redis中没有数据，查询数据库
+
+
+
+        log.info("dish: {}" ,dish);//categoryId=1397844263642378242,status=1
+        //获取参数
+        Long categoryId = dish.getCategoryId();
+        Integer status = dish.getStatus();
+
+        //Dish条件构造
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper=new LambdaQueryWrapper();
+        lambdaQueryWrapper.eq(Dish::getCategoryId,categoryId);
+        lambdaQueryWrapper.eq(Dish::getStatus,status);
+        lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getCreateTime);
+
+
+
+        //查询数据库，查询dish
+        List<Dish> list = this.list(lambdaQueryWrapper);
+
+        dishDtoList=  list.stream().map(itme ->{
+
+            //创建dishdto对象，对象拷贝
+            DishDto dishDto=new DishDto();
+            BeanUtils.copyProperties(itme,dishDto);
+
+            //查询category名称
+
+            Category category = categoryService.getById(categoryId);
+
+            if(category!=null){
+                String categoryName = category.getName();
+                dishDto.setCategoryName(categoryName);
+            }
+
+            Long dishId = itme.getId();
+            //dish_flavor条件构造器
+            LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper1=new LambdaQueryWrapper();
+            lambdaQueryWrapper1.eq(DishFlavor::getDishId,dishId);
+
+
+            //查询dish_flavor
+            List<DishFlavor> flavors = dishFlavorService.list(lambdaQueryWrapper1);
+
+            dishDto.setFlavors(flavors);
+
+            return dishDto;
+        }).collect(Collectors.toList());
+        //将查询到的数据备份到redis,设置60分钟过期
+
+        redisTemplate.opsForValue().set(key,dishDtoList,60, TimeUnit.MINUTES);
+
+
+        return dishDtoList;
+    }
+
 
 
 }

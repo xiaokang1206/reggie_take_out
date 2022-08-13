@@ -37,7 +37,7 @@ public class OrderController {
      */
     @RequestMapping("/submit")
     public R<String> submit(@RequestBody Orders orders){
-log.info("订单数据 : {}",orders);
+    log.info("订单数据 : {}",orders);
     orderService.submit(orders);
         return R.success("下单成功");
     }
@@ -85,7 +85,6 @@ log.info("订单数据 : {}",orders);
         log.info("Order: {}" ,orders);
 
         //修改订单的status为 3
-
            orderService.dispatch(orders);
         return R.success("派送成功");
     }

@@ -32,12 +32,14 @@ public class CommonController {
     @PostMapping("/upload")
     public R<String> upload(MultipartFile file){
         //file是一个临时文件，需要转存到指定位置，否则本次请求完成后临时文件会删除
+        //文件上传三要素：post请求，input属性：type="file",from表单的属性:enctype="multipart/from-data"
        log.info(file.toString());
         String originalFilename = file.getOriginalFilename();//abc.jpg
         String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));//.jpg
 
-        //使用UUID重新生成文件名，防止文件名称重复造成覆盖
+        //使用UUID重新生成文件名，防止文件名称重复造成覆盖 UUID 是由一组32位数的16进制数字所构成
         String fileName = UUID.randomUUID().toString()+suffix;//sdasdasda
+
 
                    File dir=new File(basePath);
                   //判断当前目录是否存在

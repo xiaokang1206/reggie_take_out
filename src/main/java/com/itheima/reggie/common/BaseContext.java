@@ -7,6 +7,7 @@ public class BaseContext {
 
     private static  ThreadLocal<Long> threadLocal=new ThreadLocal<Long>();
 
+
     public static void setThreadLocal(Long id){
         threadLocal.set(id);
     }
